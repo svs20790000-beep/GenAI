@@ -1,0 +1,4 @@
+from transformers import pipeline
+ner_tagger=pipeline('ner',model='dslim/bert-base-NER')
+entitles=ner_tagger('Amitabh Bachan is my favourite actor who lives in India')
+print(entitles)
