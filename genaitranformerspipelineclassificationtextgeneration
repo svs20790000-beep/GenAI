@@ -1,0 +1,3 @@
+from transformers import pipeline
+gen=pipeline('text-generation')
+gen('AI will transform the business because',max_length=50)
