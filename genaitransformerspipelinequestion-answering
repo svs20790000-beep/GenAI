@@ -1,0 +1,8 @@
+from transformers import pipeline
+qa=pipeline('question-answering')
+qa(
+    {
+        "context":'roht sharma lives in india',
+        'question':'where rohit sharma lives'
+    }
+)
