@@ -1,0 +1,5 @@
+from transformers import pipeline
+sentiment=pipeline('sentiment-analysis',model='tabularisai/multilingual-sentiment-analysis')
+sentiment('customer services was vey polite')
+sentiment('customer services was worst')
+sentiment('customer services was ok')
