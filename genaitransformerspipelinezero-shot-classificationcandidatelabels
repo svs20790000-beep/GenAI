@@ -1,0 +1,6 @@
+from transformers import pipeline
+customer_message='I am facing issue with my billing'
+issues_classifier=pipeline('zero-shot-classification')
+labels=['network issue','billing issue','customer support issue']
+issues_result=issues_classifier(customer_message,candidate_labels=labels)
+print(issues_result)
