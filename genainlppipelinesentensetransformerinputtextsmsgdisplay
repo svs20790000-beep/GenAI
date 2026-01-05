@@ -1,0 +1,12 @@
+from sentence_transformers import SentenceTransformer, util
+model=SentenceTransformer('sentence-transformers/all-miniLM-L6-v2')
+#while True:
+prompt1=input('sent1: ')
+prompt2=input('sent2: ')
+emb1=model.encode(prompt1,convert_to_tensor=True)
+emb2=model.encode(prompt2,convert_to_tensor=True)
+score=util.pytorch_cos_sim(emb1,emb2)
+if score >0.5:
+  print('Similar')
+else:
+   print('DisSimilar')
