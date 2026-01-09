@@ -1,0 +1,79 @@
+#import the library
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split,GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score,classification_report
+
+#read the data
+df=pd.read_csv('/content/Diabetes_RF.csv')
+
+df
+
+df.columns
+
+Index([' Number of times pregnant', ' Plasma glucose concentration',
+       ' Diastolic blood pressure', ' Triceps skin fold thickness',
+       ' 2-Hour serum insulin', ' Body mass index',
+       ' Diabetes pedigree function', ' Age (years)', ' Class variable'],
+      dtype='object')
+
+#label encoding
+from sklearn.preprocessing import LabelEncoder#splitting our data into train and test
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size =.2,random_state=42)
+le=LabelEncoder()
+df[' Class variable']=le.fit_transform(df[' Class variable'])
+
+df
+
+#segregate the data in X and y
+X=df.drop(' Class variable',axis=1)
+y=df[' Class variable']
+
+X.describe()
+
+#splitting our data into train and test
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size =.2,random_state=42)
+
+#standardization on X_train and X_test
+scaler=StandardScaler()
+X_train_scaled=scaler.fit_transform(X_train)
+X_test_scaled=scaler.fit_transform(X_test)
+
+#build the logistic regression
+from sklearn.linear_model import LogisticRegression
+lr=LogisticRegression()
+lr.fit(X_train_scaled,y_train)
+
+#prediction
+y_pred_test=lr.predict(X_test_scaled)
+y_pred_train=lr.predict(X_train_scaled)
+
+pd.DataFrame({'y_test':y_test,'y_pred_test':y_pred_test})
+
+accuracy_score(y_test,y_pred_test)
+
+#grid search cross validation
+param_grid={
+    'C':[0.01,0.1,1,10,100],
+    'penalty':['l1','l2'],
+    'solver':['lbfgs', 'liblinear', 'newton-cg']
+}
+
+help(LogisticRegression)
+
+grid=GridSearchCV(LogisticRegression(),param_grid,scoring='accuracy',cv=5)
+grid.fit(X_train_scaled,y_train)
+
+best_model=grid.best_estimator_
+best_model
+y_pred_test1=best_model.predict(X_test_scaled)
+y_pred_train1=best_model.predict(X_train_scaled)
+
+accuracy_score(y_test,y_pred_test1)
+
+accuracy_score(y_train,y_pred_train1)
+
+
