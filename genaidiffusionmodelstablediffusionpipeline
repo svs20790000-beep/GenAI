@@ -1,0 +1,22 @@
+#pip install diffusers transformers accelerate safetensors
+#import the library
+from diffusers import StableDiffusionPipeline
+import torch
+import matplotlib.pyplot as plt
+import torch
+print(torch.cuda.is_available())
+pipe=StableDiffusionPipeline.from_pretrained(
+    'runwayml/stable-diffusion-v1-5',
+    torch_dtype=torch.float16).to('cuda')
+prompt=input('enter the prompt here')
+#generate the image using the user's prompt
+with torch.autocast('cuda'):
+  image=pipe(prompt).images[0]   #prompt-->text encoder--->diffusion(noise->image)--->VAE decoder--->pil image
+#save the image to a file
+image.save('generated_image.png')
+print('image saved as generated_image.png')
+#display the image
+plt.imshow(image)
+plt.axis('off')
+plt.title(f'generated for prompt: {prompt}')
+plt.show()
