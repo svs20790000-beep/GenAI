@@ -1,0 +1,41 @@
+import tensorflow as tf
+from huggingface_hub import hf_hub_download
+from skimage.util import random_noise
+import numpy as np
+import matplotlib.pyplot as plt
+
+model_path = hf_hub_download(repo_id="BueormLLC/AID", filename="model.h5")
+
+autoencoder = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
+
+def add_noise(img, noise_type="gaussian"):
+    img_np = img.numpy()
+    if noise_type == "gaussian":
+        noisy_img = random_noise(img_np, mode='gaussian', var=0.1)
+    elif noise_type == "salt_pepper":
+        noisy_img = random_noise(img_np, mode='s&p', amount=0.1)
+    return np.clip(noisy_img, 0., 1.)
+
+def predict_denoised_image(autoencoder, image):
+    img_resized = tf.image.resize(image, (256, 256)) / 255.0
+    img_array = np.expand_dims(img_resized, axis=0)
+
+    noisy_image = add_noise(img_resized)
+
+    denoised_image = autoencoder.predict(np.expand_dims(noisy_image, axis=0))
+
+    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+    ax[0].imshow(noisy_image)
+    ax[0].set_title("Noisy Image")
+    ax[0].axis('off')
+
+    ax[1].imshow(denoised_image[0])
+    ax[1].set_title("Denoised Image")
+    ax[1].axis('off')
+
+    plt.show()
+
+test_image = tf.keras.preprocessing.image.load_img('image.jpg', target_size=(256, 256))
+test_image = tf.keras.preprocessing.image.img_to_array(test_image)
+
+predict_denoised_image(autoencoder, test_image)
