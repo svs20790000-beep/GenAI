@@ -1,9 +1,9 @@
-!pip install langchain
-!pip install -qU langchain-openai
-!pip install "langchain<0.1.0"
-!pip install unstructured
-!pip install faiss-cpu
-!pip install transformers
+#!pip install langchain
+#!pip install -qU langchain-openai
+#!pip install "langchain<0.1.0"
+#!pip install unstructured
+#!pip install faiss-cpu
+#!pip install transformers
 #import the library
 import torch
 from transformers import DPRQuestionEncoder,DPRQuestionEncoderTokenizer,DPRContextEncoder,DPRContextEncoderTokenizer
