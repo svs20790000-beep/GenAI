@@ -1,0 +1,54 @@
+!pip install langchain==0.1.16 langchain_community langchain-openai
+!pip install pypdf
+!pip install chromadb
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import chroma
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA
+import os
+from langchain_community.vectorstores import Chroma # Added to fix NameError
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI # Added for clarity
+from langchain_community.document_loaders import PyPDFLoader # Added for clarity
+from langchain_text_splitters import RecursiveCharacterTextSplitter # Added for clarity
+from langchain.chains import RetrievalQA # Added for clarity, assuming it's required
+import os
+
+# Set your OpenAI API key
+os.environ["OPENAI_API_KEY"] = ""
+
+# 1. Load the PDF
+pdf_path = "/content/sample.pdf"  # replace with your own file
+loader = PyPDFLoader(pdf_path)
+documents = loader.load()
+
+# 2. Split text into manageable chunks
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+chunks = splitter.split_documents(documents)
+
+# 3. Create embeddings and store in Chroma vector store
+embeddings = OpenAIEmbeddings()
+vector_store = Chroma.from_documents(chunks, embedding=embeddings)
+
+# 4. Create Retrieval-based QA chain
+retriever = vector_store.as_retriever()
+llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=retriever,
+    return_source_documents=True
+)
+
+# 5. Ask a question
+query = "Summarize the contract's termination clause."
+result = qa_chain(query)
+
+# 6. Print the answer
+print("\nAnswer:")
+print(result["result"])
+
+print("\nSource(s):")
+for doc in result["source_documents"]:
+    print(f"Page Content: {doc.page_content[:200]}...")  # show preview
